@@ -122,6 +122,29 @@ function _print_workout_string() {
     done
 }
 
+# Helper function that prints a specific workout from a workout_string
+# PARAM - ${1} - Workout to search for 
+# PARAM - ${2} - All workouts in a specific format 
+#   EX: SOGE_WORKOUT Jawns-Pushups:1000-Pullups:1000-1000 Touches:1
+# RETURN - String of Workout and Reps 
+function _get_workout() {
+    search_string=${1}
+    workout_string=${2}
+
+
+    IFS='-' read -ra workouts <<< "${workout_string}"  # Split the workout string by '-'
+    for workout in "${workouts[@]}"; do
+        # Extract workout name and reps
+        workout_name="${workout%%:*}"
+        reps="${workout#*:}" 
+
+        if [[ "${search_string}" == "${workout_name}" ]]; then 
+            workout_name_capital="$(_capitalize_first_letter ${workout_name})"
+            echo -e "${green}${workout_name_capital}${clear}: ${reps}"
+        fi 
+    done
+}
+
 ## 
 # Main Functionality functions 
 ## 
@@ -271,21 +294,44 @@ function sogelogs_new_entry() {
     echo -e "\n\n" >> ${filename}
 }
 
+# Can add a "Statistic" to a log
+# Appends the statistic before open user input 
+# PARAM - ${1} - "Statistic" to track before input
+# RETURN - String with ${1} preprended to user input
+function sogelogs_new_statistic() {
+    statistic=${1}
+
+    echo -e "${yellow}When finished: CTRL+D${clear}" >&2
+    user_input=$(cat)
+
+    # Replace actual newlines with the string '\n'
+    converted_input=$(echo "${user_input}" | awk '{printf "%s\\n", $0}')
+    converted_input=$(echo "${converted_input}" | sed 's/\\n$//') # Remove the last '\n'
+
+    echo -n "${statistic}${converted_input}"
+}
+
+
 function sogelogs_help() {
-    echo -e "${red}HELP${red}
-    ${green}Opens Main Information Page${clear}
-      > sogelogs 
+    echo -e "${red}Options:${clear}
+        ${green}-h${clear},
+            Display this help message and exit.
 
-    ${green}Create a new entry${clear}
-      > sogelogs -n 
-
-    ${green}Workout Stats (Displays a list of all workouts for a given period)${clear}
-      > sogelogs -s --workout
-
-    ${green}Random Thought (Gets a random thought stored)${clear}
-      > sogelogs -r
-      \n\n\n
-    "
+        ${green}-n${clear},
+            Creates new log entry.
+            ${cyan}--workout${clear}
+                Prompts new workout entry.
+            ${cyan}--thought${clear} 
+                Prompts open text for a new thought.
+            
+        ${green}-r${clear},
+            Gets a random thought.
+            
+        ${green}-s${clear}, ${cyan}--workout${clear} 
+                Gets all workout statistics.
+            ${cyan}--workout${clear} ${blue}<workout>${clear} 
+                Gets workout statistic for specified workout.
+        "   
 }
 
 ## 
@@ -349,6 +395,8 @@ function menu() {
 function parse_command_line_options() {
     # variables 
     n_flag=false
+    n_workout=""
+    n_thought=""
     r_flag=false
     s_flag=false
     s_workout=""
@@ -363,6 +411,13 @@ function parse_command_line_options() {
             -n)
                 n_flag=true
                 shift
+                if [[ "$1" == "--workout" ]]; then
+                    n_workout="exist"
+                    shift
+                elif [[ "$1" == "--thought" ]]; then 
+                    n_thought="exist"
+                    shift
+                fi
                 ;;
             -r)
                 r_flag=true
@@ -398,7 +453,13 @@ function parse_command_line_options() {
 
     # Creating Logs 
     if $n_flag; then 
-        sogelogs_new_entry
+        if [ "${n_workout}" == "exist" ]; then
+            sogelogs_new_entry "$(sogelogs_track_workout)"
+        elif [ "${n_thought}" == "exist" ]; then 
+            sogelogs_new_entry "$(sogelogs_new_statistic "SOGE_THOUGHT")"
+        else 
+            sogelogs_new_entry
+        fi
     fi
 
     # Random Searches 
@@ -411,7 +472,8 @@ function parse_command_line_options() {
         if [ "${s_workout}" == "default_workout_value" ]; then
             _print_workout_string "$(sogelogs_workout_statistics)"
         elif [ -n "${s_workout}" ]; then 
-            echo "${s_workout}"
+            all=$(sogelogs_workout_statistics)
+            echo "$(_get_workout ${s_workout} "${all}")"
         else 
             echo -e "${red}Invalid Argument${clear}"
             echo "-s (Statistics) flag takes the following arguements"

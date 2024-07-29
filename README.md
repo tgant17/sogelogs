@@ -8,5 +8,11 @@ Opens Menu
 #### Options
 | Flag | |
 |----|-------------------|
-| -n | Create a new entry|
-| -r | Gets a Random Thought|
+| -h | Displays help message. |
+| -n | Create a new entry. |
+| --workout | Prompts new workout entry. |
+| --thought | Prompts open text for a new thought. |
+| -r | Gets a Random Thought. |
+| -s | Statistics. | 
+| --workout | Gets all workout statistics. |
+| --workout <workout> | Gets statistics for <workout>. |
