@@ -10,11 +10,14 @@
 # > sogelogs -s --workout
 
 # Go back and mkdir logs/ if it DNE
+# Make global color variables CAPITAL
+# sogelogs -s --workout pushups -> has a bug where it needs to read all lowercase
 
-# Add in ability to create new workout from command line -n --workout
-
-# Go back and make all variables local or maybe global?
-
+## 
+# Directory Variables
+## 
+CURRENT_DIRECTORY=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+LOGS_DIRECTORY=${CURRENT_DIRECTORY}"/logs"
 
 ## 
 # Color Variables 
@@ -187,7 +190,7 @@ function sogelogs_workout_statistics() {
     search_string="SOGE_WORKOUT"
     title="Workout Statistics"
 
-    for file in ./logs/*.txt; do
+    for file in ${LOGS_DIRECTORY}/*.txt; do
         # Find lines that start with the search string, remove the search string, and add to matches array
         while IFS= read -r line; do
             matches+=("$line")
@@ -227,7 +230,7 @@ function sogelogs_search_logs() {
     matches=()
     returnString=""
 
-    for file in ./logs/*.txt; do
+    for file in ${LOGS_DIRECTORY}/*.txt; do
         # Find lines that start with the search string, remove the search string, and add to matches array
         while IFS= read -r line; do
             matches+=("$line")
@@ -274,7 +277,7 @@ function sogelogs_print_log() {
 function sogelogs_new_entry() {
     current_date=$(date +"%Y-%m-%d")
     current_time=$(date +"%H:%M:%S")
-    filename="./logs/${current_date}.txt"
+    filename="${LOGS_DIRECTORY}/${current_date}.txt"
 
     # If file exists (Date)
     if [ -e "${filename}" ]; then
@@ -312,6 +315,7 @@ function sogelogs_new_statistic() {
 }
 
 
+# Update help
 function sogelogs_help() {
     echo -e "${red}Options:${clear}
         ${green}-h${clear},
@@ -329,8 +333,8 @@ function sogelogs_help() {
             
         ${green}-s${clear}, ${cyan}--workout${clear} 
                 Gets all workout statistics.
-            ${cyan}--workout${clear} ${blue}<workout>${clear} 
-                Gets workout statistic for specified workout.
+            ${cyan}--workout${clear} ${blue}<exercise>${clear} 
+                Gets workout statistic for specified exercise.
         "   
 }
 
@@ -368,7 +372,7 @@ function menu() {
         echo -e "${green}Welcome to Sogelogs!${clear}"
     fi
 
-    most_recent_file=$(ls -t "./logs" | head -n 1)
+    most_recent_file=$(ls -t "${LOGS_DIRECTORY}" | head -n 1)
 
     echo -ne "${cyan}Options:${clear}
     ${cyan}1)${clear} New log 
@@ -382,7 +386,7 @@ function menu() {
         read a 
         case $a in
             1) clear ; sogelogs_new_entry ; menu 1 ;;
-            2) clear ; sogelogs_print_log "./logs/${most_recent_file}"  ; menu 1 ;;
+            2) clear ; sogelogs_print_log "${LOGS_DIRECTORY}/${most_recent_file}"  ; menu 1 ;;
             3) clear ; sogelogs_search_logs "SOGE_THOUGHT" -r ; menu 1 ;;
             4) clear ; sogelogs_new_entry "$(sogelogs_track_workout)" ; clear ; menu 1 ;;
             5) clear ; workout_menu ; menu 1 ;;

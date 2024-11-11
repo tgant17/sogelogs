@@ -1,5 +1,16 @@
 ### SogeLogs Version 0.1 
 ---
+#### Setup 
+Must add "sogelogs" alias to bash profile.
+```
+alias sogelogs="/Path/to/script.sh"
+```
+Example: 
+```
+alias sogelogs="~/Scripts/sogelogs/sogelogs.sh"
+``` 
+*  On Apple Silicon 
+  * ~/.zshrc
 #### User Functionality 
  
 ``` > sogelogs ``` 
@@ -15,4 +26,4 @@ Opens Menu
 | -r | Gets a Random Thought. |
 | -s | Statistics. | 
 | --workout | Gets all workout statistics. |
-| --workout <workout> | Gets statistics for <workout>. |
+| --workout <exercise> | Gets statistics for <exercise>. |
