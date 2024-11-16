@@ -22,7 +22,9 @@ Opens Menu
 | -n | Create a new entry. | |
 | | --workout | Prompts new workout entry. |
 | | --thought | Prompts open text for a new thought. |
-| -r | Gets a Random Thought. | |
+| -r | | |
+| | --thought | Gets a random thought. |
+| | --proverb | Gets a random sogeverb. |
 | -s | Statistics. | |
 | | --workout | Gets all workout statistics. |
 | | --workout {exercise} | Gets statistics for {exercise}. |

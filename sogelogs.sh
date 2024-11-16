@@ -37,7 +37,11 @@ function sogelogs_help() {
                 Prompts open text for a new thought.
             
         ${GREEN}-r${CLEAR},
-            Gets a random thought.
+            ${CYAN}--thought${CLEAR} 
+                Gets a random thought.
+            ${CYAN}--proverb${CLEAR} 
+                Gets a random sogeverb.
+
             
         ${GREEN}-s${CLEAR}, ${CYAN}--workout${CLEAR} 
                 Gets all workout statistics.
@@ -68,7 +72,7 @@ function menu() {
         case $a in
             1) CLEAR ; sogelogs_new_entry ; menu 1 ;;
             2) CLEAR ; sogelogs_print_log "${LOGS_DIRECTORY}/${most_recent_file}"  ; menu 1 ;;
-            3) CLEAR ; _sogelogs_search_logs "SOGE_THOUGHT" -r ; menu 1 ;;
+            3) CLEAR ; _sogelogs_search_prefix_logs "SOGE_THOUGHT" -r ; menu 1 ;;
             4) CLEAR ; sogelogs_new_entry "$(sogelogs_track_workout)" ; CLEAR ; menu 1 ;;
             5) CLEAR ; workout_menu ; menu 1 ;;
             6) CLEAR ; sogelogs_help ; menu 1 ;;
@@ -82,7 +86,10 @@ function parse_command_line_options() {
     n_flag=false
     n_workout=""
     n_thought=""
+    n_proverb=""
     r_flag=false
+    r_thought=""
+    r_proverb=""
     s_flag=false
     s_workout=""
 
@@ -102,11 +109,21 @@ function parse_command_line_options() {
                 elif [[ "$1" == "--thought" ]]; then 
                     n_thought="exist"
                     shift
+                elif [[ "$1" == "--proverb" ]]; then 
+                    n_proverb="exist"
+                    shift
                 fi
                 ;;
             -r)
                 r_flag=true
                 shift
+                if [[ "$1" == "--thought" ]]; then 
+                    r_thought="exist"
+                    shift
+                elif [[ "$1" == "--proverb" ]]; then 
+                    r_proverb="exist"
+                    shift
+                fi 
                 ;;
             -s)
                 s_flag=true
@@ -142,6 +159,8 @@ function parse_command_line_options() {
             sogelogs_new_entry "$(sogelogs_track_workout)"
         elif [ "${n_thought}" == "exist" ]; then 
             sogelogs_new_entry "$(sogelogs_new_statistic "SOGE_THOUGHT")"
+        elif [ "${n_proverb}" == "exist" ]; then 
+            sogelogs_new_entry "$(sogelogs_new_statistic "SOGE_VERB")"
         else 
             sogelogs_new_entry
         fi
@@ -149,7 +168,17 @@ function parse_command_line_options() {
 
     # Random Searches 
     if $r_flag; then 
-        _sogelogs_search_logs "SOGE_THOUGHT" -r 
+        if [ "${r_thought}" == "exist" ]; then 
+            _sogelogs_search_prefix_logs "SOGE_THOUGHT" -r 
+        elif [ "${r_proverb}" == "exist" ]; then 
+            _sogelogs_search_prefix_logs "SOGE_VERB" -r 
+        else 
+            echo -e "${RED}Invalid Argument${CLEAR}"
+            echo "-r (Random) flag takes the following arguements"
+            echo ""
+            echo "--thought    Gets a random thought" 
+            echo "--proverb    Gets a random sogeverb" 
+        fi
     fi
 
     # Statistics 

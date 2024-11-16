@@ -32,10 +32,10 @@ function _concat_array() {
     echo "${concatenated}"
 }
 
-# Function to search through sogelogs for a certain pattern 
+# Function to search through sogelogs for a certain prefixed pattern 
 # PARAM - ${1} - Pattern to search for 
 # PARAM - ${2} - Optional - If provided, just print a random value from all the patterns matched
-function _sogelogs_search_logs() {
+function _sogelogs_search_prefix_logs() {
     search_string=${1}
     random_value=${2}
     matches=()
