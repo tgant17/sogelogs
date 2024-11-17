@@ -32,34 +32,9 @@ function _concat_array() {
     echo "${concatenated}"
 }
 
-# Function to search through sogelogs for a certain prefixed pattern 
-# PARAM - ${1} - Pattern to search for 
-# PARAM - ${2} - Optional - If provided, just print a random value from all the patterns matched
-function _sogelogs_search_prefix_logs() {
-    search_string=${1}
-    random_value=${2}
-    matches=()
-    returnString=""
-
-    for file in ${LOGS_DIRECTORY}/*.txt; do
-        # Find lines that start with the search string, remove the search string, and add to matches array
-        while IFS= read -r line; do
-            matches+=("$line")
-        done < <(grep "^${search_string}" "$file" | sed "s/^${search_string}//")
-    done
-
-    # Check if the array is not empty
-    if [ ${#matches[@]} -eq 0 ]; then
-        echo "No matches found"
-    else
-        # If random_value DNE 
-        if [[ -z ${random_value} ]]; then
-            for match in "${matches[@]}"; do
-                echo -e "${match}"
-            done
-        else 
-            random_index=$((RANDOM % ${#matches[@]}))
-            echo -e "${GREEN}${matches[$random_index]}${CLEAR}"
-        fi
-    fi
+# Helper function to print hashbar for formatting
+function _sogelogs_print_hash_bar() {
+    terminal_width=$(tput cols)
+    printf '#%.0s' $(seq 1 $terminal_width) 
+    echo
 }

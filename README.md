@@ -19,6 +19,10 @@ Opens Menu
 | Flag | | |
 |----|----|----|
 | -h | Displays help message. | |
+| -a | Prints all logs. | |
+| | --help | Prints commands to help navigate all logs. |
+| | --thought | Prints all thoughts. |
+| | --proverb | Prints all sogeverbs. |
 | -n | Create a new entry. | |
 | | --workout | Prompts new workout entry. |
 | | --thought | Prompts open text for a new thought. |

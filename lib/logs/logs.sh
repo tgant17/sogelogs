@@ -46,19 +46,14 @@ function sogelogs_new_entry() {
     echo -e "\n\n" >> ${filename}
 }
 
-# Can add a "Statistic" to a log
-# Appends the statistic before open user input 
-# PARAM - ${1} - "Statistic" to track before input
-# RETURN - String with ${1} preprended to user input
-function sogelogs_new_statistic() {
-    statistic=${1}
+# Function to print all logs -> Eventually add functionality for date ranges, other search features(?)
+function sogelogs_print_logs() {
+    all_logs=""
 
-    echo -e "${YELLOW}When finished: CTRL+D${CLEAR}" >&2
-    user_input=$(cat)
+    for file in ${LOGS_DIRECTORY}/*.txt; do
+        all_logs+="$(_sogelogs_print_hash_bar)"
+        all_logs+="$(<${file})${NEWLINE}"
+    done
 
-    # Replace actual newlines with the string '\n'
-    converted_input=$(echo "${user_input}" | awk '{printf "%s\\n", $0}')
-    converted_input=$(echo "${converted_input}" | sed 's/\\n$//') # Remove the last '\n'
-
-    echo -n "${statistic}${converted_input}"
+    echo "${all_logs}" | less -R
 }

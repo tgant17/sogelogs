@@ -29,6 +29,15 @@ function sogelogs_help() {
         ${GREEN}-h${CLEAR},
             Display this help message and exit.
 
+        ${GREEN}-a${CLEAR},
+            Prints all logs.
+            ${CYAN}--help${CLEAR}
+                Prints commands to help navigate all logs.
+            ${CYAN}--thought${CLEAR} 
+                Prints all thoughts.
+            ${CYAN}--proverb${CLEAR} 
+                Prints all sogeverbs.
+
         ${GREEN}-n${CLEAR},
             Creates new log entry.
             ${CYAN}--workout${CLEAR}
@@ -65,17 +74,19 @@ function menu() {
     ${CYAN}3)${CLEAR} Get a Random Thought :)
     ${CYAN}4)${CLEAR} Record Workout
     ${CYAN}5)${CLEAR} Workout Menu
-    ${CYAN}6)${CLEAR} help
+    ${CYAN}6)${CLEAR} Sogeverbs
+    ${CYAN}7)${CLEAR} help
     ${CYAN}0)${CLEAR} exit
     ${BLUE}\nChoose an Option: ${CLEAR}"
         read a 
         case $a in
             1) CLEAR ; sogelogs_new_entry ; menu 1 ;;
             2) CLEAR ; sogelogs_print_log "${LOGS_DIRECTORY}/${most_recent_file}"  ; menu 1 ;;
-            3) CLEAR ; _sogelogs_search_prefix_logs "SOGE_THOUGHT" -r ; menu 1 ;;
+            3) CLEAR ; search_prefix "SOGE_THOUGHT" -r ; menu 1 ;;
             4) CLEAR ; sogelogs_new_entry "$(sogelogs_track_workout)" ; CLEAR ; menu 1 ;;
             5) CLEAR ; workout_menu ; menu 1 ;;
-            6) CLEAR ; sogelogs_help ; menu 1 ;;
+            6) CLEAR ; print_all_prefix "SOGE_VERB" ; menu 1 ;;
+            7) CLEAR ; sogelogs_help ; menu 1 ;;
                 0) CLEAR ; exit 0 ;;
                 *) echo -e "${RED} Wrong option.${CLEAR}" WrongCommand ;;
         esac
@@ -83,13 +94,20 @@ function menu() {
 
 function parse_command_line_options() {
     # variables 
+    a_flag=false
+    a_thought=""
+    a_proverb=""
+    a_help=""
+
     n_flag=false
     n_workout=""
     n_thought=""
     n_proverb=""
+
     r_flag=false
     r_thought=""
     r_proverb=""
+
     s_flag=false
     s_workout=""
 
@@ -99,6 +117,20 @@ function parse_command_line_options() {
             -h)
                 sogelogs_help
                 exit 0
+                ;;
+            -a) 
+                a_flag=true
+                shift 
+                if [[ "$1" == "--thought" ]]; then 
+                    a_thought="exist"
+                    shift
+                elif [[ "$1" == "--proverb" ]]; then 
+                    a_proverb="exist"
+                    shift
+                elif [[ "$1" == "--help" ]]; then 
+                    a_help="exist"
+                    shift
+                fi
                 ;;
             -n)
                 n_flag=true
@@ -152,15 +184,27 @@ function parse_command_line_options() {
     # Shift to next arguement
     shift $((OPTIND-1))
 
+    # Print all 
+    if $a_flag; then 
+        if [ "${a_thought}" == "exist" ]; then 
+            print_all_prefix "SOGE_THOUGHT"
+        elif [ "${a_proverb}" == "exist" ]; then 
+            print_all_prefix "SOGE_VERB"
+        elif [ "${a_help}" == "exist" ]; then 
+            all_log_navigation
+        else 
+            sogelogs_print_logs
+        fi
+    fi
 
     # Creating Logs 
     if $n_flag; then 
         if [ "${n_workout}" == "exist" ]; then
             sogelogs_new_entry "$(sogelogs_track_workout)"
         elif [ "${n_thought}" == "exist" ]; then 
-            sogelogs_new_entry "$(sogelogs_new_statistic "SOGE_THOUGHT")"
+            sogelogs_new_entry "$(new_prefix "SOGE_THOUGHT")"
         elif [ "${n_proverb}" == "exist" ]; then 
-            sogelogs_new_entry "$(sogelogs_new_statistic "SOGE_VERB")"
+            sogelogs_new_entry "$(new_prefix "SOGE_VERB")"
         else 
             sogelogs_new_entry
         fi
@@ -169,9 +213,9 @@ function parse_command_line_options() {
     # Random Searches 
     if $r_flag; then 
         if [ "${r_thought}" == "exist" ]; then 
-            _sogelogs_search_prefix_logs "SOGE_THOUGHT" -r 
+            search_prefix "SOGE_THOUGHT" -r 
         elif [ "${r_proverb}" == "exist" ]; then 
-            _sogelogs_search_prefix_logs "SOGE_VERB" -r 
+            search_prefix "SOGE_VERB" -r 
         else 
             echo -e "${RED}Invalid Argument${CLEAR}"
             echo "-r (Random) flag takes the following arguements"

@@ -17,3 +17,8 @@ MAGENTA='\033[35m'
 CYAN='\033[36m'
 GRAY='\033[37m'
 CLEAR='\033[0m'
+
+##
+# Explicit newline 
+##
+NEWLINE=$'\n'
