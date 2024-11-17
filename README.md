@@ -26,6 +26,7 @@ Opens Menu
 | -n | Create a new entry. | |
 | | --workout | Prompts new workout entry. |
 | | --thought | Prompts open text for a new thought. |
+| | --proverb | Prompts open text for a new sogeverb. |
 | -r | | |
 | | --thought | Gets a random thought. |
 | | --proverb | Gets a random sogeverb. |

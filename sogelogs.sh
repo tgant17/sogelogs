@@ -44,6 +44,8 @@ function sogelogs_help() {
                 Prompts new workout entry.
             ${CYAN}--thought${CLEAR} 
                 Prompts open text for a new thought.
+            ${CYAN}--proverb${CLEAR} 
+                Prompts open text for a new sogeverb.
             
         ${GREEN}-r${CLEAR},
             ${CYAN}--thought${CLEAR} 
