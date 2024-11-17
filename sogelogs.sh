@@ -1,6 +1,6 @@
 #!/bin/bash
 # Journal / Workout / Life / 
-# Version 0.1.1 
+# Version 0.1.2
 
 # Go back and mkdir logs/ if it DNE
 # sogelogs -s --workout pushups -> has a bug where it needs to read all lowercase

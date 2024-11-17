@@ -1,4 +1,4 @@
-## SogeLogs Version 0.1.1 
+## SogeLogs Version 0.1.2
 ### Setup 
 Must add "sogelogs" alias to bash profile.
 *  On Apple Silicon: ~/.zshrc
