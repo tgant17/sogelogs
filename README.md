@@ -1,3 +1,4 @@
+## Learning Bash :)
 ## SogeLogs Version 0.1.3
 ### Setup 
 Must add "sogelogs" alias to bash profile.
