@@ -1,4 +1,4 @@
-## SogeLogs Version 0.1.2
+## SogeLogs Version 0.1.3
 ### Setup 
 Must add "sogelogs" alias to bash profile.
 *  On Apple Silicon: ~/.zshrc
@@ -27,9 +27,11 @@ Opens Menu
 | | --workout | Prompts new workout entry. |
 | | --thought | Prompts open text for a new thought. |
 | | --proverb | Prompts open text for a new sogeverb. |
+| | --done | Prompts new done list entry. |
 | -r | | |
 | | --thought | Gets a random thought. |
 | | --proverb | Gets a random sogeverb. |
 | -s | Statistics. | |
 | | --workout | Gets all workout statistics. |
 | | --workout {exercise} | Gets statistics for {exercise}. |
+| | --done | Gets statistics for completed tasks. |

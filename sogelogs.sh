@@ -1,6 +1,6 @@
 #!/bin/bash
 # Journal / Workout / Life / 
-# Version 0.1.2
+# Version 0.1.3
 
 # Go back and mkdir logs/ if it DNE
 # sogelogs -s --workout pushups -> has a bug where it needs to read all lowercase
@@ -22,6 +22,9 @@ source "${CURRENT_DIRECTORY}/lib/logs/logs.sh"
 source "${CURRENT_DIRECTORY}/lib/workouts/helpers.sh"
 source "${CURRENT_DIRECTORY}/lib/workouts/workouts.sh"
 
+# Source "Done" functions
+source "${CURRENT_DIRECTORY}/lib/done/helpers.sh"
+source "${CURRENT_DIRECTORY}/lib/done/done.sh"
 
 
 function sogelogs_help() {
@@ -77,8 +80,9 @@ function menu() {
     ${CYAN}4)${CLEAR} Record Workout
     ${CYAN}5)${CLEAR} Workout Menu
     ${CYAN}6)${CLEAR} Sogeverbs
-    ${CYAN}7)${CLEAR} help
-    ${CYAN}0)${CLEAR} exit
+    ${CYAN}7)${CLEAR} Record Completed Tasks
+    ${CYAN}8)${CLEAR} Help
+    ${CYAN}0)${CLEAR} Exit
     ${BLUE}\nChoose an Option: ${CLEAR}"
         read a 
         case $a in
@@ -88,7 +92,8 @@ function menu() {
             4) CLEAR ; sogelogs_new_entry "$(sogelogs_track_workout)" ; CLEAR ; menu 1 ;;
             5) CLEAR ; workout_menu ; menu 1 ;;
             6) CLEAR ; print_all_prefix "SOGE_VERB" ; menu 1 ;;
-            7) CLEAR ; sogelogs_help ; menu 1 ;;
+            7) CLEAR ; sogelogs_new_entry "$(track_done_list)" ; menu 1 ;;
+            8) CLEAR ; sogelogs_help ; menu 1 ;;
                 0) CLEAR ; exit 0 ;;
                 *) echo -e "${RED} Wrong option.${CLEAR}" WrongCommand ;;
         esac
@@ -105,6 +110,7 @@ function parse_command_line_options() {
     n_workout=""
     n_thought=""
     n_proverb=""
+    n_done=""
 
     r_flag=false
     r_thought=""
@@ -112,6 +118,7 @@ function parse_command_line_options() {
 
     s_flag=false
     s_workout=""
+    s_done=""
 
     # Parse options 
     while [[ $# -gt 0 ]]; do
@@ -146,6 +153,9 @@ function parse_command_line_options() {
                 elif [[ "$1" == "--proverb" ]]; then 
                     n_proverb="exist"
                     shift
+                elif [[ "$1" == "--done" ]]; then 
+                    n_done="exist"
+                    shift
                 fi
                 ;;
             -r)
@@ -170,11 +180,10 @@ function parse_command_line_options() {
                         s_workout="default_workout_value" # Set a default value if no argument is provided
                         shift
                     fi
-                fi
-                ;;
-            --workout)
-                echo "Error: --workout option can only be used with -s."
-                exit 1
+                elif [[ "$1" == "--done" ]]; then 
+                    s_done="exist"
+                    shift
+                fi 
                 ;;
             *)
                 echo -e "${RED} Invalid option $1.${CLEAR}"
@@ -207,6 +216,8 @@ function parse_command_line_options() {
             sogelogs_new_entry "$(new_prefix "SOGE_THOUGHT")"
         elif [ "${n_proverb}" == "exist" ]; then 
             sogelogs_new_entry "$(new_prefix "SOGE_VERB")"
+        elif [ "${n_done}" == "exist" ]; then 
+            sogelogs_new_entry "$(track_done_list)"
         else 
             sogelogs_new_entry
         fi
@@ -234,6 +245,8 @@ function parse_command_line_options() {
         elif [ -n "${s_workout}" ]; then 
             all=$(sogelogs_workout_statistics)
             echo "$(_get_workout ${s_workout} "${all}")"
+        elif [ -n "${s_done}" ]; then 
+            task_stats
         else 
             echo -e "${RED}Invalid Argument${CLEAR}"
             echo "-s (Statistics) flag takes the following arguements"
