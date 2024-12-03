@@ -5,14 +5,14 @@
 function _capitalize_first_letter() {
     input="${1}"
     capitalized=""
-    
+
     read -a words <<< "${input}"
 
     for word in "${words[@]}"; do 
         capitalized+=$(echo "${word} " | awk '{print toupper(substr($0, 1, 1)) tolower(substr($0, 2))}')
     done 
 
-    echo "$(trim_whitespace "${capitalized}")"
+    echo "$(_trim_whitespace "${capitalized}")"
 }
 
 # Function that concatenates an array with a given delimeter
@@ -36,7 +36,7 @@ function _concat_array() {
     read -ra arr <<< "${array_str}"
 
     for element in "${arr[@]}"; do
-        temp_element=$(trim_whitespace "${element}")
+        temp_element=$(_trim_whitespace "${element}")
         if [ -z "${concatenated}" ]; then
             concatenated="${temp_element}"
         else
@@ -55,6 +55,6 @@ function _sogelogs_print_hash_bar() {
 }
 
 # Trims leading and trailing whitespace from a string
-function trim_whitespace() {
+function _trim_whitespace() {
     echo -e "${1}" | sed "s/^[ $(printf '\t')]*//;s/[ $(printf '\t')]*$//"
 }

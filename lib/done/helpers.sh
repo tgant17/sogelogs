@@ -24,8 +24,8 @@ function _count_tasks() {
         formatted_task="$(_capitalize_first_letter "${task}")"
         # Check if task exists in the counted_tasks array
         for i in "${!counted_tasks[@]}"; do 
-            arr_task="$(trim_whitespace "${counted_tasks[i]%%:*}")" # loop variable
-            temp_task="$(trim_whitespace "${formatted_task}")" # passed in
+            arr_task="$(_trim_whitespace "${counted_tasks[i]%%:*}")" # loop variable
+            temp_task="$(_trim_whitespace "${formatted_task}")" # passed in
             if [[ "${arr_task}" == "${temp_task}" ]]; then 
                 index="${i}"
                 break
