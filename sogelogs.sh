@@ -1,6 +1,6 @@
 #!/bin/bash
 # Journal / Workout / Life / 
-# Version 0.1.3
+# Version 0.1.4
 
 # Go back and mkdir logs/ if it DNE
 # sogelogs -s --workout pushups -> has a bug where it needs to read all lowercase
@@ -26,6 +26,9 @@ source "${CURRENT_DIRECTORY}/lib/workouts/workouts.sh"
 source "${CURRENT_DIRECTORY}/lib/done/helpers.sh"
 source "${CURRENT_DIRECTORY}/lib/done/done.sh"
 
+# Source "Prompts" functions
+source "${CURRENT_DIRECTORY}/lib/prompts/prompts.sh"
+
 
 function sogelogs_help() {
     echo -e "${RED}Options:${CLEAR}
@@ -49,12 +52,24 @@ function sogelogs_help() {
                 Prompts open text for a new thought.
             ${CYAN}--proverb${CLEAR} 
                 Prompts open text for a new sogeverb.
+            ${CYAN}--expressive${CLEAR}
+                Launches the expressive writing prompt.
+            ${CYAN}--gratitude${CLEAR}
+                Launches the gratitude journaling prompt.
+            ${CYAN}--reflective${CLEAR}
+                Launches the reflective reframing prompt.
             
         ${GREEN}-r${CLEAR},
             ${CYAN}--thought${CLEAR} 
                 Gets a random thought.
             ${CYAN}--proverb${CLEAR} 
                 Gets a random sogeverb.
+            ${CYAN}--expressive${CLEAR}
+                Gets a random expressive writing entry.
+            ${CYAN}--gratitude${CLEAR}
+                Gets a random gratitude journaling entry.
+            ${CYAN}--reflective${CLEAR}
+                Gets a random reflective reframing entry.
 
             
         ${GREEN}-s${CLEAR}, ${CYAN}--workout${CLEAR} 
@@ -82,6 +97,7 @@ function menu() {
     ${CYAN}6)${CLEAR} Sogeverbs
     ${CYAN}7)${CLEAR} Record Completed Tasks
     ${CYAN}8)${CLEAR} Help
+    ${CYAN}9)${CLEAR} Writing Prompts
     ${CYAN}0)${CLEAR} Exit
     ${BLUE}\nChoose an Option: ${CLEAR}"
         read a 
@@ -94,6 +110,7 @@ function menu() {
             6) CLEAR ; print_all_prefix "SOGE_VERB" ; menu 1 ;;
             7) CLEAR ; sogelogs_new_entry "$(track_done_list)" ; menu 1 ;;
             8) CLEAR ; sogelogs_help ; menu 1 ;;
+            9) CLEAR ; prompt_menu ; menu 1 ;;
                 0) CLEAR ; exit 0 ;;
                 *) echo -e "${RED} Wrong option.${CLEAR}" WrongCommand ;;
         esac
@@ -111,10 +128,12 @@ function parse_command_line_options() {
     n_thought=""
     n_proverb=""
     n_done=""
+    n_prompt_type=""
 
     r_flag=false
     r_thought=""
     r_proverb=""
+    r_prompt_type=""
 
     s_flag=false
     s_workout=""
@@ -156,6 +175,15 @@ function parse_command_line_options() {
                 elif [[ "$1" == "--done" ]]; then 
                     n_done="exist"
                     shift
+                elif [[ "$1" == "--expressive" ]]; then
+                    n_prompt_type="expressive"
+                    shift
+                elif [[ "$1" == "--gratitude" ]]; then
+                    n_prompt_type="gratitude"
+                    shift
+                elif [[ "$1" == "--reflective" ]]; then
+                    n_prompt_type="reflective"
+                    shift
                 fi
                 ;;
             -r)
@@ -166,6 +194,15 @@ function parse_command_line_options() {
                     shift
                 elif [[ "$1" == "--proverb" ]]; then 
                     r_proverb="exist"
+                    shift
+                elif [[ "$1" == "--expressive" ]]; then
+                    r_prompt_type="expressive"
+                    shift
+                elif [[ "$1" == "--gratitude" ]]; then
+                    r_prompt_type="gratitude"
+                    shift
+                elif [[ "$1" == "--reflective" ]]; then
+                    r_prompt_type="reflective"
                     shift
                 fi 
                 ;;
@@ -218,6 +255,8 @@ function parse_command_line_options() {
             sogelogs_new_entry "$(new_prefix "SOGE_VERB")"
         elif [ "${n_done}" == "exist" ]; then 
             sogelogs_new_entry "$(track_done_list)"
+        elif [ -n "${n_prompt_type}" ]; then
+            sogelogs_record_prompt "${n_prompt_type}"
         else 
             sogelogs_new_entry
         fi
@@ -229,12 +268,17 @@ function parse_command_line_options() {
             search_prefix "SOGE_THOUGHT" -r 
         elif [ "${r_proverb}" == "exist" ]; then 
             search_prefix "SOGE_VERB" -r 
+        elif [ -n "${r_prompt_type}" ]; then
+            sogelogs_random_prompt_entry "${r_prompt_type}"
         else 
             echo -e "${RED}Invalid Argument${CLEAR}"
             echo "-r (Random) flag takes the following arguements"
             echo ""
             echo "--thought    Gets a random thought" 
             echo "--proverb    Gets a random sogeverb" 
+            echo "--expressive Gets a random expressive entry"
+            echo "--gratitude  Gets a random gratitude entry"
+            echo "--reflective Gets a random reflective entry"
         fi
     fi
 

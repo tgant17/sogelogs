@@ -9,15 +9,28 @@ function sogelogs_print_log() {
 
     _sogelogs_print_hash_bar
     while IFS= read -r line; do
-        if [[ "$line" == *"SOGE_WORKOUT"* ]]; then
-            modified_line=$(echo "$line"  | sed 's/SOGE_WORKOUT//')
-            _print_workout_string ${modified_line}
-        else
-            echo "${line}"
-        fi
+        _render_log_line "${line}"
     done < "${file}"
     _sogelogs_print_hash_bar
     echo -e "\n"
+}
+
+# Handles formatting per log line
+function _render_log_line() {
+    local line="$1"
+    local prompt_prefix=${PROMPT_PREFIX:-SOGE_PROMPT}
+
+    if [[ "$line" == *"SOGE_WORKOUT"* ]]; then
+        modified_line=$(echo "$line"  | sed 's/SOGE_WORKOUT//')
+        _print_workout_string ${modified_line}
+    elif [[ "$line" == ${prompt_prefix}\|* ]]; then
+        local payload="${line#${prompt_prefix}|}"
+        local prompt_key="${payload%%|*}"
+        local stored_text="${payload#*|}"
+        _print_prompt_log_entry "${prompt_key}" "${stored_text}"
+    else
+        echo "${line}"
+    fi
 }
 
 # Creates a log file at ${LOGS_DIRECTORY}/${current_date}.txt
@@ -48,12 +61,9 @@ function sogelogs_new_entry() {
 
 # Function to print all logs -> Eventually add functionality for date ranges, other search features(?)
 function sogelogs_print_logs() {
-    all_logs=""
-
-    for file in ${LOGS_DIRECTORY}/*.txt; do
-        all_logs+="$(_sogelogs_print_hash_bar)"
-        all_logs+="$(<${file})${NEWLINE}"
-    done
-
-    echo "${all_logs}" | less -R
+    {
+        for file in ${LOGS_DIRECTORY}/*.txt; do
+            sogelogs_print_log "${file}"
+        done
+    } | less -R
 }
