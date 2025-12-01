@@ -58,3 +58,17 @@ function _sogelogs_print_hash_bar() {
 function _trim_whitespace() {
     echo -e "${1}" | sed "s/^[ $(printf '\t')]*//;s/[ $(printf '\t')]*$//"
 }
+
+# Converts actual newline characters into literal \n tokens for storage
+function _literalize_newlines() {
+    local input="$1"
+    local converted
+    converted=$(printf '%s' "${input}" | awk '{printf "%s\\n", $0}')
+    echo "${converted%\\n}"
+}
+
+# Restores literal \n tokens back into newline characters for display
+function _expand_literal_newlines() {
+    local input="$1"
+    printf '%s' "${input}" | awk '{gsub(/\\n/, "\n"); print}'
+}
