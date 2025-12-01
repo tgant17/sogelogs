@@ -56,7 +56,7 @@ function sogelogs_prompt_entry() {
         return 1
     fi
 
-    CLEAR
+    CLEAR >&2
     echo -e "${CYAN}Writing Prompt${CLEAR}" >&2
     _print_prompt_overview
     echo -e "${YELLOW}When finished: CTRL+D${CLEAR}" >&2
